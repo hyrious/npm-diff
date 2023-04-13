@@ -11,7 +11,7 @@ await esbuild.build({
   bundle: true,
   format: 'esm',
   outfile: 'dist/index.js',
-  external: ['./lib/*', 'pako', 'diff'],
+  external: ['./lib/*', 'pako', 'diff', 'binary-extensions'],
 })
 
 await esbuild.build({
