@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@hyrious/npm-diff test</title>
+</head>
+<body>
+
+  <label for="a">old:</label>
+  <input id="a" value="vite@4.2.0">
+
+  <label for="b">new:</label>
+  <input id="b" value="vite">
+
+  <button onclick="do_diff()">DIFF!</button>
+  
+  <pre id="output"></pre>
+
+  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
+  <script src="dist/index.global.js"></script>
+  <script>
+    const { diff } = npmdiff
+
+    async function do_diff() {
+      const specs = [
+        document.getElementById('a').value,
+        document.getElementById('b').value,
+      ]
+      const patch = await diff(specs).catch(err => err.message)
+      document.getElementById('output').textContent = patch
+    }
+  </script>
+</body>
+</html>

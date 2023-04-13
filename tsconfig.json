@@ -1,0 +1,18 @@
+{
+  "include": ["src", "lib"],
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true,
+    "useUnknownInCatchVariables": false,
+    "useDefineForClassFields": false,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}

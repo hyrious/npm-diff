@@ -1,0 +1,48 @@
+{
+  "name": "@hyrious/npm-diff",
+  "version": "0.1.0",
+  "description": "libnpmdiff, but detects renames and works on browser",
+  "keywords": [
+    "npm",
+    "diff"
+  ],
+  "license": "MIT",
+  "author": "hyrious <hyrious@outlook.com>",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "main": "dist/index.js",
+  "jsdelivr": "dist/index.global.js",
+  "unpkg": "dist/index.global.js",
+  "module": "dist/index.js",
+  "browser": {
+    "./lib/unzip.js": "./lib/unzip-browser.js"
+  },
+  "types": "./dist/index.d.js",
+  "files": [
+    "src",
+    "lib",
+    "dist"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js"
+  },
+  "dependencies": {
+    "binary-extensions": "^2.2.0",
+    "diff": "^5.1.0"
+  },
+  "devDependencies": {
+    "@hyrious/dts": "^0.1.8",
+    "esbuild": "^0.17.16"
+  },
+  "peerDependencies": {
+    "pako": "*"
+  },
+  "peerDependenciesMeta": {
+    "pako": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
