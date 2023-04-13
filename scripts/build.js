@@ -45,7 +45,7 @@ function globals(config) {
       })
       onLoad({ filter: /./, namespace: 'globals' }, (args) => {
         const globalName = config[args.path]
-        return { contents: `export default ${globalName}` }
+        return { contents: `module.exports = ${globalName}` }
       })
     },
   }

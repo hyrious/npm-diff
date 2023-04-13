@@ -1,5 +1,5 @@
 import binaryExtensions from 'binary-extensions'
-import jsDiff from 'diff'
+import { createTwoFilesPatch } from 'diff'
 import { Heap } from './heap'
 
 /**
@@ -194,11 +194,10 @@ export function format_diff({ files, opts = {}, refs, versions }: FormatArgs): s
     header(`index ${opts.tagVersionPrefix || 'v'}${versions.a}..${opts.tagVersionPrefix || 'v'}${versions.b} ${mode}`)
 
     if (should_print_patch((a_filename || b_filename)!, opts)) {
-      patch += jsDiff
-        .createTwoFilesPatch(names.a, names.b, contents.a || '', contents.b || '', '', '', {
-          context: opts.diffUnified === 0 ? 0 : opts.diffUnified || 3,
-          ignoreWhitespace: opts.diffIgnoreAllSpace,
-        })
+      patch += createTwoFilesPatch(names.a, names.b, contents.a || '', contents.b || '', '', '', {
+        context: opts.diffUnified === 0 ? 0 : opts.diffUnified || 3,
+        ignoreWhitespace: opts.diffIgnoreAllSpace,
+      })
         .replace('===================================================================\n', '')
         .replace(/\t\n/g, '\n')
     } else {
