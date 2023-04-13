@@ -21,6 +21,8 @@ console.log(await diff(['abbrev@1.1.0', 'abbrev@1.1.1']))
 In browser:
 
 ```html
+<script src="https://cdn.jsdelivr.net/npm/pako"></script>
+<script src="https://cdn.jsdelivr.net/npm/diff"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hyrious/npm-diff"></script>
 <script>
   const { diff } = npmdiff
@@ -32,7 +34,7 @@ Or:
 
 ```html
 <script type="module">
-  import { diff } from 'https://cdn.jsdelivr.net/npm/@hyrious/npm-diff'
+  import { diff } from 'https://esm.sh/@hyrious/npm-diff'
   console.log(await diff(...))
 </script>
 ```
@@ -60,6 +62,31 @@ The spec is usually described in `<pkg-name>@<version>`.
 Returns a `Promise` that fullfils with a `String` containing the resulting patch diffs.
 
 Throws an error if either `a` or `b` are missing or if trying to diff more than two specs.
+
+##### More Examples
+
+**Store packages in indexedDB**, see **[idb-keyval](https://www.npmjs.com/package/idb-keyval)**
+
+```js
+import * as idb from 'idb-keyval'
+
+const patch = await diff(['abbrev@1.1.0', 'abbrev@1.1.1'], {
+  cache_get: ({ name, version }) => idb.get(`${name}@${version}`),
+  cache_set: ({ name, version }, tarball) => idb.set(`${name}@${version}`, tarball),
+})
+```
+
+**Render patch to html**, see **[diff2html](https://www.npmjs.com/package/diff2html)**
+
+```js
+const patch = await diff(['abbrev@1.1.0', 'abbrev@1.1.1'])
+const ui = new Diff2HtmlUI($('#diff'), patch, {
+  drawFileList: true,
+  outputFormat: 'line-by-line',
+})
+ui.draw()
+ui.highlightCode()
+```
 
 ## License
 

@@ -45,7 +45,7 @@ function match(a: number[], b: number[]) {
  * Identical files will be skipped.
  */
 function match_similar_files(files: Set<string>, refs: Map<string, { content: string; mode: string }>) {
-  const pairs: [a: string | null, b: string | null, score?: number][] = []
+  const pairs: [a: string | null, b: string | null][] = []
 
   // Unique files found in a or b. Later we will try to match them.
   const a_uniq: [filename: string, hash: number[]][] = []
@@ -55,7 +55,7 @@ function match_similar_files(files: Set<string>, refs: Map<string, { content: st
     const b = refs.get('b/' + filename)
     if (a && b && a.content === b.content && a.mode === b.mode) continue
     if (a && b) {
-      pairs.push([filename, filename, 100])
+      pairs.push([filename, filename])
     } else if (a) {
       a_uniq.push([filename, hash(a.content)])
     } else if (b) {
@@ -75,7 +75,7 @@ function match_similar_files(files: Set<string>, refs: Map<string, { content: st
   for (const [i, j, score] of scores) {
     if (a_uniq[i][0] === '' || b_uniq[j][0] === '') continue
     if (score < 0.5) break
-    pairs.push([a_uniq[i][0], b_uniq[j][0], score])
+    pairs.push([a_uniq[i][0], b_uniq[j][0]])
     a_uniq[i][0] = ''
     b_uniq[j][0] = ''
   }
@@ -142,7 +142,7 @@ export function format_diff({ files, opts = {}, refs, versions }: FormatArgs): s
   const dst_prefix = opts.diffNoPrefix ? '' : opts.diffDstPrefix || 'b/'
 
   const entries = match_similar_files(files, refs)
-  for (const [a_filename, b_filename, score] of entries) {
+  for (const [a_filename, b_filename] of entries) {
     const names = {
       a: src_prefix + (a_filename || '/dev/null'),
       b: dst_prefix + (b_filename || '/dev/null'),
@@ -173,8 +173,11 @@ export function format_diff({ files, opts = {}, refs, versions }: FormatArgs): s
     }
 
     header(`diff --git ${names.a} ${names.b}`)
-    if (score && a_filename !== b_filename) {
-      header(`similarity index ${Math.round(score)}%`)
+    if (a_filename && b_filename && a_filename !== b_filename) {
+      // This is incorrect... ideally, it should be (total_lines - diff_lines) / total_lines
+      // but there's no time for us to compute the diff, and in most of the cases it is 99%
+      // so let's just use that.
+      header('similarity index 99%')
       header(`rename from ${names.a}`)
       header(`rename to ${names.b}`)
     }

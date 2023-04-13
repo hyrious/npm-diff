@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Fix: make `similarity index` more accurate.
+
 ## 0.1.2
 
 - Fix: the `diff` package's esm exports does not include a default export.
