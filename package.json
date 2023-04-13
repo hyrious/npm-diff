@@ -1,6 +1,6 @@
 {
   "name": "@hyrious/npm-diff",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "libnpmdiff, but detects renames and works on browser",
   "keywords": [
     "npm",
