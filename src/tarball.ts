@@ -17,7 +17,10 @@ export interface TarballOptions {
    * const cache_get = ({ name, version }) => localStorage.getItem(`${name}@${version}`)
    * ```
    */
-  cache_get?: (pkg: { name: string; version: string }) => Promise<Uint8Array> | Uint8Array | null | undefined
+  cache_get?: (pkg: {
+    name: string
+    version: string
+  }) => Promise<Uint8Array | null | undefined> | Uint8Array | null | undefined
 
   /**
    * A function that saves the tarball to cache.
