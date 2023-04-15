@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>NPM Diff</title>
+  <meta name="description" content="Diff two npm tarballs, detect file renames.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html@3.4.34/bundles/css/diff2html.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.7.0/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.7.0/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="dist/main.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <samp>diff -u</samp>
+      <input class="spec" id="a" autocomplete="off" placeholder="vite@4.2.0"></input>
+      <input class="spec" id="b" autocomplete="off" placeholder="vite@4.2.1"></input>
+      <button id="run" title="diff([spec1, spec2])">RUN</button>
+      <button id="btn-options">Options</button>
+      <span class="split"></span>
+      <button id="btn-version-picker">Version Picker</button>
+      <a class="btn" href="https://github.com/hyrious/npm-diff" target="_blank" title="hyrious/npm-diff">GitHub</a>
+    </header>
+    <article id="diff-container"></article>
+    <aside id="version-picker" style="display: none;">
+      <div class="row">
+        <input id="version-picker-input" autocomplete="off" placeholder="vite">
+        <button id="version-picker-btn" disabled>FETCH</button>
+        <select id="versions" style="display: none;"></select>
+      </div>
+      <p class="message" id="version-picker-error" style="display: none;"></p>
+      <div id="version-picker-actions" class="row evenly">
+        <button data-fill="a">Fill Left</button>
+        <button data-fill="b">Fill Right</button>
+      </div>
+      <button id="version-picker-btn-close">Close</button>
+    </aside>
+    <aside id="options" style="display: none;">
+      <fieldset id="diff-options">
+        <legend>Diff Options</legend>
+        <div class="grid">
+          <label for="diffUnified">diffUnified</label>
+          <input id="diffUnified" type="number" value="3" title="How many lines to print around each hunk.">
+          <label for="diffIgnoreAllSpace">diffIgnoreAllSpace</label>
+          <div id="diffIgnoreAllSpace" class="row" title="Whether or not should ignore changes in whitespace.">
+            <label><input name="diffIgnoreAllSpace" value="false" type="radio" checked><samp>false</samp></label>
+            <label><input name="diffIgnoreAllSpace" value="true" type="radio"><samp>true</samp></label>
+          </div>
+          <label for="diffNameOnly">diffNameOnly</label>
+          <div id="diffNameOnly" class="row" title="Prints only file names and no patch diffs.">
+            <label><input name="diffNameOnly" value="false" type="radio" checked><samp>false</samp></label>
+            <label><input name="diffNameOnly" value="true" type="radio"><samp>true</samp></label>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset id="rendering-options">
+        <legend>Rendering Options</legend>
+        <div class="row">
+          <input id="h" type="checkbox" checked>
+          <label for="h">Syntax highlight</label>
+        </div>
+        <div id="f" class="row">
+          <input name="f" id="f-l" value="line-by-line" type="radio" checked>
+          <label for="f-l">Line by line</label>
+          <input name="f" id="f-s" value="side-by-side" type="radio">
+          <label for="f-s">Side by side</label>
+        </div>
+      </fieldset>
+      <div class="row evenly">
+        <button id="options-btn-save">Save</button>
+        <button id="options-btn-close">Close</button>
+      </div>
+    </aside>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.34/bundles/js/diff2html-ui-slim.min.js"></script>
+  <script src="dist/main.js"></script>
+</body>
+</html>
