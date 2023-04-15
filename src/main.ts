@@ -22,7 +22,7 @@ if (__DEV__) {
 }
 
 import './styles.css'
-import { diff, DiffOptions } from '../../src/index'
+import { valid, diff, DiffOptions } from '../../src/index'
 import { get, set, keys, createStore } from 'idb-keyval'
 
 declare const Diff2HtmlUI: any
@@ -57,6 +57,7 @@ const cache_options: DiffOptions = {
   cache_set: (pkg, data) => set(idb_key(pkg), data, NPM_PACKAGES),
 }
 
+let is_first_run = true
 let hash = ''
 let diffUnified = 3
 let diffIgnoreAllSpace = false
@@ -64,6 +65,7 @@ let diffNameOnly = false
 let highlight = true
 let outputFormat = 'line-by-line'
 
+const $title = $('#title')
 const $spec_a = $<HTMLInputElement>('#a')
 const $spec_b = $<HTMLInputElement>('#b')
 const $run = $<HTMLButtonElement>('#run')
@@ -79,7 +81,6 @@ const $outputFormat = $('#f')
 const $options_btn_save = $<HTMLButtonElement>('#options-btn-save')
 const $options_btn_close = $<HTMLButtonElement>('#options-btn-close')
 
-const $btn_version_picker = $<HTMLButtonElement>('#btn-version-picker')
 const $version_picker = $('#version-picker')
 const $version_picker_input = $<HTMLInputElement>('#version-picker-input')
 const $version_picker_btn = $<HTMLButtonElement>('#version-picker-btn')
@@ -87,6 +88,12 @@ const $versions = $<HTMLSelectElement>('#versions')
 const $version_picker_error = $('#version-picker-error')
 const $version_picker_actions = $('#version-picker-actions')
 const $version_picker_btn_close = $<HTMLButtonElement>('#version-picker-btn-close')
+
+$title.ondblclick = function reset(ev) {
+  ev.stopPropagation()
+  ev.preventDefault()
+  location.replace(location.pathname)
+}
 
 $btn_options.onclick = function toggle_options() {
   toggle($options)
@@ -124,7 +131,7 @@ function read_union(div: HTMLElement, def: string) {
   return def
 }
 
-$btn_version_picker.onclick = function toggle_version_picker() {
+function toggle_version_picker() {
   if (toggle($version_picker)) {
     const a = $spec_a.value
     let name: string
@@ -135,7 +142,6 @@ $btn_version_picker.onclick = function toggle_version_picker() {
       name = a
     }
     $version_picker_input.value = name
-    $version_picker_input.focus()
     show($version_picker_btn)
     hide($versions)
     refresh_version_picker_btn()
@@ -150,10 +156,19 @@ function refresh_version_picker_btn() {
   $version_picker_btn.disabled = !name
 }
 
-$version_picker_input.onkeyup = function click(ev) {
-  if (ev.key === 'Enter' && !ev.ctrlKey && !ev.altKey && !ev.shiftKey && !ev.metaKey) {
-    $version_picker_btn.click()
+function is_enter(ev: KeyboardEvent) {
+  return ev.key === 'Enter' && !ev.ctrlKey && !ev.altKey && !ev.shiftKey && !ev.metaKey
+}
+
+function on_enter(cb: () => void) {
+  return function click(ev: KeyboardEvent) {
+    if (is_enter(ev)) cb()
   }
+}
+
+$version_picker_input.onkeyup = function keyup(ev) {
+  if (is_enter(ev)) $version_picker_btn.click()
+  else if (ev.key === 'Escape') $version_picker_btn_close.click()
 }
 
 $version_picker_btn.onclick = function load_versions() {
@@ -167,7 +182,7 @@ $version_picker_btn.onclick = function load_versions() {
       else throw new Error(await r.json().then((e) => e.message))
     })
     .then((data) => {
-      load_versions_into($versions, data)
+      load_versions_into(name, $versions, data)
     })
     .catch((error) => {
       show($version_picker_error)
@@ -178,6 +193,7 @@ $version_picker_btn.onclick = function load_versions() {
 }
 
 function load_versions_into(
+  name: string,
   select: HTMLSelectElement,
   data: { tags: Record<string, string>; versions: string[] },
 ) {
@@ -202,6 +218,14 @@ function load_versions_into(
   $version_picker_btn.textContent = 'FETCH'
   $version_picker_btn.disabled = false
   refresh_version_picker_actions()
+  if (select.value && is_first_run) {
+    $spec_b.value = name + '@' + select.value
+    const i = versions.indexOf(select.value)
+    if (i !== -1 && i + 1 < versions.length) $spec_a.value = name + '@' + versions[i + 1]
+    $run.focus()
+    is_first_run = false
+  }
+  refresh_location()
 }
 
 function refresh_version_picker_actions() {
@@ -218,13 +242,28 @@ $version_picker_actions.onclick = function fill_specs(ev) {
 
 $version_picker_btn_close.onclick = function close() {
   hide($version_picker)
+  $spec_b.focus()
 }
 
-$spec_a.onkeyup = $spec_b.onkeyup = function click(ev) {
-  if (ev.key === 'Enter' && !ev.ctrlKey && !ev.altKey && !ev.shiftKey && !ev.metaKey) {
-    $run.click()
+function is_valid_input(spec: string) {
+  const at = spec.indexOf('@', 1)
+  if (at > 0) {
+    spec = spec.slice(at + 1)
+    return valid(spec)
   }
+  return false
 }
+
+$spec_a.onkeyup = $spec_b.onkeyup = on_enter(() => {
+  const a = $spec_a.value
+  const b = $spec_b.value
+  if (is_valid_input(a) && is_valid_input(b)) {
+    $run.click()
+  } else {
+    toggle_version_picker()
+    $version_picker_btn.click()
+  }
+})
 
 function refresh_location() {
   const a = $spec_a.value
@@ -252,6 +291,7 @@ $run.onclick = function run() {
   }
   $run.textContent = 'Loading...'
   $run.disabled = true
+  hide($version_picker)
   console.time('diff')
   diff([a, b], { diffUnified, diffIgnoreAllSpace, diffNameOnly, ...cache_options })
     .then(render_patch)

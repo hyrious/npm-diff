@@ -80,10 +80,18 @@ select {
 }
 
 .btn:active,
+.btn:focus,
+button:not(:disabled):focus,
 button:not(:disabled):active,
+select:not(:disabled):focus,
 select:not(:disabled):active {
   border-color: var(--fg);
   background-color: var(--border);
+}
+
+label:focus-within,
+.row > input:focus + label {
+  box-shadow: 0 0 0 2px var(--fg);
 }
 
 input:not(:disabled):focus-visible {
@@ -109,6 +117,7 @@ samp {
 
 .btn {
   text-decoration: none;
+  outline: none;
 }
 
 header {
@@ -153,6 +162,11 @@ fieldset {
   flex-flow: column nowrap;
   border-color: var(--border);
   gap: 0.25rem;
+}
+
+.title {
+  user-select: none;
+  cursor: default;
 }
 
 .row {
