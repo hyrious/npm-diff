@@ -277,6 +277,7 @@ function refresh_location() {
     if (outputFormat === 'side-by-side') url += '&f=s'
     if (hash) url += '#' + hash
     history.replaceState(null, '', url)
+    document.title = a + ' → ' + b
   }
 }
 
