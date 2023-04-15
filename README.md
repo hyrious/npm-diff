@@ -2,6 +2,8 @@
 
 > [libnpmdiff](https://www.npmjs.com/package/libnpmdiff), but detects renames and works on browser
 
+Try it online: [**hyrious.me/npm-diff**](https://hyrious.me/npm-diff)
+
 ## Usage
 
 ### CLI
