@@ -283,7 +283,10 @@ function refresh_location() {
 
 $spec_a.oninput = $spec_b.oninput = refresh_location
 
-$run.onclick = function run() {
+let cached_spec = ''
+let cached_patch = ''
+
+$run.onclick = function run(ev) {
   const a = $spec_a.value
   const b = $spec_b.value
   if (!a || !b) {
@@ -294,9 +297,23 @@ $run.onclick = function run() {
   $run.disabled = true
   hide($version_picker)
   console.time('diff')
-  diff([a, b], { diffUnified, diffIgnoreAllSpace, diffNameOnly, ...cache_options })
-    .then(render_patch)
-    .catch(render_error)
+
+  const spec = [a, b, diffUnified, diffIgnoreAllSpace, diffNameOnly].join()
+  if (ev && ev.altKey) {
+    run_server_diff()
+  } else if (spec === cached_spec) {
+    render_patch(cached_patch)
+  } else if ([a, b].join() === cached_spec) {
+    render_patch(cached_patch, false, true)
+  } else {
+    diff([a, b], { diffUnified, diffIgnoreAllSpace, diffNameOnly, ...cache_options })
+      .then((patch) => {
+        cached_spec = spec
+        cached_patch = patch
+        render_patch(patch)
+      })
+      .catch(render_error)
+  }
 }
 
 function restore_run() {
@@ -304,10 +321,11 @@ function restore_run() {
   $run.disabled = false
 }
 
-function render_patch(patch: string) {
+function render_patch(patch: string, nameOnly = diffNameOnly, bigChanges = false) {
   console.timeEnd('diff')
+  Object.assign(window, { patch })
   // If only names, convert names to patch format
-  if (diffNameOnly) {
+  if (nameOnly) {
     const lines = patch.split('\n').filter(Boolean)
     let out = ''
     for (const line of lines) {
@@ -317,15 +335,18 @@ function render_patch(patch: string) {
   }
   restore_run()
   console.time('diff2html')
+  $diff_container.classList.remove('error')
+  $diff_container.innerHTML = ''
   const ui = new Diff2HtmlUI($diff_container, patch, {
-    diffMaxChanges: 2000,
+    diffMaxChanges: bigChanges ? undefined : 2500,
     drawFileList: true,
-    fileListStartVisible: diffNameOnly,
+    fileListStartVisible: nameOnly,
     fileContentToggle: false,
-    renderNothingWhenEmpty: diffNameOnly,
+    renderNothingWhenEmpty: nameOnly,
     outputFormat,
     stickyFileHeaders: false,
     highlight,
+    highlightLanguages: { cjs: 'javascript' },
   })
   Object.assign(window, { ui })
   ui.draw()
@@ -341,12 +362,39 @@ function render_patch(patch: string) {
   }
 }
 
-function render_error(error: Error) {
+function render_error(error: Error, try_again = true) {
   console.timeEnd('diff')
   restore_run()
   console.error(error)
-  alert(error.message)
+  $diff_container.classList.add('error')
+  if (try_again) {
+    $diff_container.innerHTML = `${error.message}, try again with <button onclick="run_server_diff()">server-side diff</button> ?`
+  } else {
+    $diff_container.textContent = error.message
+  }
 }
+
+function run_server_diff() {
+  const a = $spec_a.value
+  const b = $spec_b.value
+  const spec = [a, b].join()
+  if (spec === cached_spec) {
+    render_patch(cached_patch)
+  } else {
+    const url = `https://runkit.io/hyrious/git-diff/branches/master/?a=${a}&b=${b}`
+    $diff_container.textContent = 'Running diff from server...'
+    fetch(url)
+      .then((r) => r.text())
+      .then((patch) => {
+        cached_spec = spec
+        cached_patch = patch
+        render_patch(patch, false, true)
+      })
+      .catch((error) => render_error(error, false))
+  }
+}
+
+Object.assign(window, { run_server_diff })
 
 const query = Object.fromEntries(new URLSearchParams(location.search))
 hash = location.hash.slice(1)

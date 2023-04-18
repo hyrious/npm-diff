@@ -37,6 +37,10 @@ div {
   flex-flow: column nowrap;
 }
 
+#app {
+  flex: 1;
+}
+
 input,
 button,
 textarea,
@@ -136,10 +140,16 @@ header {
 }
 
 article {
+  flex: 1;
   padding: 0.75rem;
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
+}
+
+.error {
+  font-family: monospace;
+  font-size: 1rem;
 }
 
 aside {
