@@ -64,6 +64,7 @@ let diffIgnoreAllSpace = false
 let diffNameOnly = false
 let highlight = true
 let outputFormat = 'line-by-line'
+let registry = ''
 
 const $title = $('#title')
 const $spec_a = $<HTMLInputElement>('#a')
@@ -76,6 +77,7 @@ const $options = $('#options')
 const $diffUnified = $<HTMLInputElement>('#diffUnified')
 const $diffIgnoreAllSpace = $('#diffIgnoreAllSpace')
 const $diffNameOnly = $('#diffNameOnly')
+const $registry = $<HTMLInputElement>('#registry')
 const $highlight = $<HTMLInputElement>('#h')
 const $outputFormat = $('#f')
 const $options_btn_save = $<HTMLButtonElement>('#options-btn-save')
@@ -110,6 +112,7 @@ $options_btn_save.onclick = function save_options() {
   diffNameOnly = read_boolean($diffNameOnly)
   highlight = $highlight.checked
   outputFormat = read_union($outputFormat, 'line-by-line')
+  registry = $registry.value
   hide($options)
   refresh_location()
   $run.click()
@@ -275,6 +278,7 @@ function refresh_location() {
     if (diffNameOnly) url += '&l=1'
     if (highlight === false) url += '&h=0'
     if (outputFormat === 'side-by-side') url += '&f=s'
+    if (registry) url += '&r=' + registry
     if (hash) url += '#' + hash
     history.replaceState(null, '', url)
     document.title = a + ' → ' + b
@@ -306,7 +310,7 @@ $run.onclick = function run(ev) {
   } else if ([a, b].join() === cached_spec) {
     render_patch(cached_patch, false, true)
   } else {
-    diff([a, b], { diffUnified, diffIgnoreAllSpace, diffNameOnly, ...cache_options })
+    diff([a, b], { diffUnified, diffIgnoreAllSpace, diffNameOnly, ...cache_options, registry })
       .then((patch) => {
         cached_spec = spec
         cached_patch = patch
@@ -416,6 +420,9 @@ $<HTMLInputElement>('#diffIgnoreAllSpace [value="' + diffIgnoreAllSpace + '"]').
 
 if (query.l === '1') diffNameOnly = true
 $<HTMLInputElement>('#diffNameOnly [value="' + diffNameOnly + '"]').checked = true
+
+if (query.r) registry = query.r
+$registry.value = query.r || ''
 
 if (query.a && query.b) $run.click()
 
