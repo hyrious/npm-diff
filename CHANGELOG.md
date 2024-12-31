@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0
+
+- Upgrade all dependencies.
+- Add `registry` option to specify the registry URL.
+
 ## 0.1.3
 
 - Fix: make `similarity index` more accurate.

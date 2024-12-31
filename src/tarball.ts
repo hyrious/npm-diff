@@ -36,6 +36,11 @@ export interface TarballOptions {
    * An {@link AbortSignal} object instance to abort the request.
    */
   signal?: AbortSignal
+
+  /**
+   * The registry URL to fetch the tarball, default is `'https://registry.npmjs.org'`.
+   */
+  registry?: string
 }
 
 /**
@@ -50,7 +55,13 @@ export interface TarballOptions {
  * ```
  */
 export async function tarball(pkg: { name: string; version: string }, opts: TarballOptions = {}) {
-  const url = `https://registry.npmjs.org/${pkg.name}/-/${pkg.name.split('/').pop()}-${pkg.version}.tgz`
+  let url = `https://registry.npmjs.org/${pkg.name}/-/${pkg.name.split('/').pop()}-${pkg.version}.tgz`
+  if (opts.registry) {
+    let registry = opts.registry
+    if (!registry.includes('://')) registry = `https://${registry}`
+    if (registry.endsWith('/')) registry = registry.slice(0, -1)
+    url = url.replace('https://registry.npmjs.org', registry)
+  }
   if (tarball_cache.has(url)) {
     return tarball_cache.get(url)!
   }

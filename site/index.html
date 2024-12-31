@@ -37,7 +37,7 @@
     </aside>
     <aside id="options" style="display: none;">
       <fieldset id="diff-options">
-        <legend>Diff Options</legend>
+        <legend>Diff</legend>
         <div class="grid">
           <label for="diffUnified">diffUnified</label>
           <input id="diffUnified" type="number" value="3" title="How many lines to print around each hunk.">
@@ -54,7 +54,7 @@
         </div>
       </fieldset>
       <fieldset id="rendering-options">
-        <legend>Rendering Options</legend>
+        <legend>Rendering</legend>
         <div class="row">
           <input id="h" type="checkbox" checked>
           <label for="h">Syntax highlight</label>
@@ -64,6 +64,13 @@
           <label for="f-l">Line by line</label>
           <input name="f" id="f-s" value="side-by-side" type="radio">
           <label for="f-s">Side by side</label>
+        </div>
+      </fieldset>
+      <fieldset id="other-options">
+        <legend>Other</legend>
+        <div class="grid">
+          <label for="registry">registry</label>
+          <input id="registry" placeholder="https://registry.npmjs.org" title="The base URL of the npm registry.">
         </div>
       </fieldset>
       <div class="row evenly">

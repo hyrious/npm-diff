@@ -4,7 +4,9 @@ import * as esbuild from 'esbuild'
 
 await fs.rm('dist', { recursive: true, force: true })
 
-const build_dts = dts.build('src/index.ts', 'dist/index.d.ts')
+const build_dts = dts.build({
+  entryPoints: ['src/index.ts'],
+})
 
 await esbuild.build({
   entryPoints: ['src/index.ts'],
