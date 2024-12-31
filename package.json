@@ -1,19 +1,20 @@
 {
   "name": "@hyrious/npm-diff",
-  "version": "0.1.3",
+  "type": "module",
+  "version": "0.2.0",
   "description": "libnpmdiff, but detects renames and works on browser",
+  "author": "hyrious <hyrious@outlook.com>",
+  "license": "MIT",
+  "repository": "hyrious/npm-diff",
   "keywords": [
     "npm",
     "diff"
   ],
-  "license": "MIT",
-  "author": "hyrious <hyrious@outlook.com>",
-  "type": "module",
   "exports": "./dist/index.js",
   "main": "dist/index.js",
-  "jsdelivr": "dist/index.global.js",
-  "unpkg": "dist/index.global.js",
   "module": "dist/index.js",
+  "unpkg": "dist/index.global.js",
+  "jsdelivr": "dist/index.global.js",
   "browser": {
     "./lib/unzip.js": "./lib/unzip-browser.js"
   },
@@ -23,18 +24,12 @@
     "lib",
     "dist"
   ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "node scripts/build.js",
     "docs": "node scripts/docs.js"
-  },
-  "dependencies": {
-    "binary-extensions": "^3.0.0",
-    "diff": "^7.0.0"
-  },
-  "devDependencies": {
-    "@hyrious/dts": "^0.3.0",
-    "esbuild": "^0.24.2",
-    "idb-keyval": "^6.2.1"
   },
   "peerDependencies": {
     "pako": "*"
@@ -44,7 +39,13 @@
       "optional": true
     }
   },
-  "engines": {
-    "node": ">=20"
+  "dependencies": {
+    "binary-extensions": "^3.0.0",
+    "diff": "^7.0.0"
+  },
+  "devDependencies": {
+    "@hyrious/dts": "^0.3.0",
+    "esbuild": "^0.24.2",
+    "idb-keyval": "^6.2.1"
   }
 }
